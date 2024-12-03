@@ -1,5 +1,4 @@
-#ifndef VECTOR_H
-#define VECTOR_H
+#include "vector.h"
 #include <math.h>
 
 
@@ -96,4 +95,3 @@ float distance(Vec3 v1, Vec3 v2) {
 
 
 
-#endif

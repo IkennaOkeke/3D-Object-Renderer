@@ -1,6 +1,4 @@
-#ifndef SPHERES_C
-#define SPHERES_C
-
+#include "spheres.h"
 #include "vector.h"
 
 
@@ -63,5 +61,3 @@ Sphere *createSphere(float radius, Vec3 position, Vec3 color) {
 
 
 int doesIntersect(const Sphere *sphere, Vec3 rayPos, Vec3 rayDir, float *t);
-
-#endif
