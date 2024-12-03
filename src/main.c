@@ -17,16 +17,16 @@ float FOCAL_LENGTH;
 Vec3 LIGHT_POSITION;
 float LIGHT_BRIGHTNESS;
 
-int COLOUR_NUMBER, BACKGROUND_COLOUR_INDEX;
+Vec3 BACKGROUND_COLOUR;
+int BACKGROUND_COLOUR_INDEX;
 
-Vec3 BACKGROUND_COLOUR = {(float)0.00, (float)0.00, (float)0.00}; //default background colour (for milestone 2)
-
+Vec3 SPHERE_COLOUR;
 int SPHERE_NUMBER;
 
 float SHADOW_FACTOR = 0.1;
 
-Vec3 SPHERE_COLOUR = {(float)1.00, (float)1.00, (float)1.00};
 
+int COLOUR_NUMBER;
 unsigned int COLOURS;
 
 
@@ -49,7 +49,6 @@ int main(int argc, char *argv[]) {
 
     // gets the image dimensions
     fscanf(input_file, "%d %d", &IMAGE_WIDTH, &IMAGE_HEIGHT);
-
     // gets the image viewpoint_height, viewpoint_width (using a simple x/y = a/b calculation), and focal_length
     fscanf(input_file, "%f", &VIEWPORT_HEIGHT);
     fscanf(input_file, "%f", &FOCAL_LENGTH);
@@ -67,18 +66,17 @@ int main(int argc, char *argv[]) {
         fscanf(input_file, "%x", &COLOURS[index]);
 
     }
-
-    // executes a statement using the COLOURS array to prevent errors // remove later
-    unsigned int a = COLOURS[0];
-    a += 1;
+    qsort(COLOURS, COLOUR_NUMBER, sizeof(unsigned int), compareColor);
 
     // gets background colour index
     fscanf(input_file, "%d", &BACKGROUND_COLOUR_INDEX);
+    BACKGROUND_COLOUR = unpackRGB(COLOURS[BACKGROUND_COLOUR_INDEX]);
 
     // gets sphere amount, and creates an array of spheres and an array of ints for colour indexes
     fscanf(input_file, "%d", &SPHERE_NUMBER);
     // Sphere SPHERES[SPHERE_NUMBER];
-    int SPHERE_COLOUR_INDEXES[SPHERE_NUMBER];
+    // int SPHERE_COLOUR_INDEXES[SPHERE_NUMBER];
+    int colour_index;
 
     // for loop to store the info for each sphere; its position and colour
     for (int index = 0; index < SPHERE_NUMBER; index++) {
@@ -87,8 +85,8 @@ int main(int argc, char *argv[]) {
         Sphere *empty_sphere = createSphere(0.00, CAMERA_POSITION, SPHERE_COLOUR);
         addSphere(world, empty_sphere);
 
-        fscanf(input_file, "%f %f %f %f %d", &(((world->spheres)[index])->pos.x), &(((world->spheres)[index])->pos.y), &(((world->spheres)[index])->pos.z), &(((world->spheres)[index])->r), &SPHERE_COLOUR_INDEXES[index]);
-        (world->spheres)[index]->color = SPHERE_COLOUR;
+        fscanf(input_file, "%f %f %f %f %d", &(((world->spheres)[index])->pos.x), &(((world->spheres)[index])->pos.y), &(((world->spheres)[index])->pos.z), &(((world->spheres)[index])->r), &colour_index);
+        (world->spheres)[index]->color = unpackRGB(COLOURS[colour_index]);
 
     }
 
@@ -101,9 +99,6 @@ int main(int argc, char *argv[]) {
     fprintf(output_file, "P3\n%d %d\n255\n", IMAGE_WIDTH, IMAGE_HEIGHT);
 
     // variable declaration for upcoming loop/s
-    Vec3 current_pixel;
-    Vec3 current_sphere_pos;
-    float t;
     float width_ratio = VIEWPORT_WIDTH / IMAGE_WIDTH;
     float height_ratio = VIEWPORT_HEIGHT / IMAGE_HEIGHT;
 
@@ -112,99 +107,113 @@ int main(int argc, char *argv[]) {
 
         for (int x_index = 0; x_index < IMAGE_WIDTH; x_index++) {
 
-            // scales current pixel to viewport dimensions
-            current_pixel.x = ((float)x_index - (float)IMAGE_WIDTH / 2.0) * width_ratio + (width_ratio / 2.0);
-            current_pixel.y = ((float)y_index - (float)IMAGE_HEIGHT / 2.0) * height_ratio + (height_ratio / 2.0);
-            current_pixel.z = (float)VIEWPORT_Z;
+            int mod_x = 0;
+            int mod_y = 0;
+            Vec3 colour_sum = {(float)0.00, (float)0.00, (float)0.00};
 
-            // initializes min_t value. Needed to store t of closest sphere, if any
-            float min_t = -1;
+            for (int sub_index = 0; sub_index < 9; sub_index++) {
 
-            // for loop to iterate through each possible sphere
-            for (int index = 0; index < SPHERE_NUMBER; index++) {
-
-                // checks to see if the ray at the current pixel intersects with a sphere
-                int intersect_check = doesIntersect(((world->spheres)[index]), CAMERA_POSITION, current_pixel, &t);
-
-                // if not, then the current pixel is not part of a sphere, we can continue
-                if (intersect_check == 0) {
-                    continue;
+                mod_x = (sub_index) % 3;
+                if ((sub_index % 3 == 0) && (sub_index != 0)) {
+                    mod_y += 1;
                 }
 
-                // if the current pixel is part of a sphere, we check to make sure the current pixel shows the frontmost sphere by choosing the lowest t value
-                if ((t < min_t) || (min_t == -1)) {
-                    min_t = t;
-                    current_sphere_pos = ((world->spheres)[index])->pos;
-                }
+                Vec3 sub_current_pixel;
+                Vec3 sub_current_sphere_pos;
+                Vec3 sub_current_colour;
+                float t;
 
-            }
+                // scales sub_current pixel to viewport dimensions
+                sub_current_pixel.x = ((float)x_index - (float)IMAGE_WIDTH / 2.0) * width_ratio + (width_ratio / 3.0) * (float)mod_x + (width_ratio / 6.00);
+                sub_current_pixel.y = ((float)y_index - (float)IMAGE_HEIGHT / 2.0) * height_ratio + (height_ratio / 3.0) * (float)mod_y + (height_ratio / 6.00);
+                sub_current_pixel.z = (float)VIEWPORT_Z;
 
-            Vec3 final_colour;
+                // initializes min_t value. Needed to store t of closest sphere, if any
+                float min_t = -1;
 
-            // sets final colour to the background colour if current pixel is not part of a sphere
-            if ((min_t == -1)) {
-                final_colour = BACKGROUND_COLOUR;
-            }
-            // shades sphere accordingly if pixel is a part of a sphere
-            else {
-                // using our t value and info given by the user, we create vectors/variables needed for our shading calculation 
-                Vec3 intersection = scalarMultiply(min_t, current_pixel);;
-                Vec3 light_direction = subtract(LIGHT_POSITION, intersection);
-                Vec3 s_colour = {(float)1.00, (float)1.00, (float)1.00};
-                Vec3 surface_normal = normalize(subtract(intersection, current_sphere_pos));
-                Vec3 light_direction_normal = normalize(light_direction);
-                float light_dot_surface = dot(light_direction_normal, surface_normal);
-                float max = 0;
-                if (max < light_dot_surface) {
-                    max = light_dot_surface;
-                }
-
-                // calculates intensity value
-                float dist = distance(LIGHT_POSITION, intersection) * distance(LIGHT_POSITION, intersection);
-                float I_0 = LIGHT_BRIGHTNESS * (max/dist);
-                float I = 1.0;
-
-                // caps our intensity value
-                if (I > I_0) {
-                    I = I_0;
-                }
-                
-                // calculates colour using intensity and sphere colour
-                final_colour = scalarMultiply(I, s_colour);
-
-                // for loop and variables to check for shading eligibility
-                int intersect_check = 0;
-                float light_t = -1;
+                // for loop to iterate through each possible sphere
                 for (int index = 0; index < SPHERE_NUMBER; index++) {
 
-                    // checks to see if the ray that goes from the current pixel's intersection point (with the sphere) to the light source intersects with another sphere
-                    intersect_check = doesIntersect(((world->spheres)[index]), add(intersection, scalarMultiply(0.001, surface_normal)), light_direction_normal, &light_t);
+                    // checks to see if the ray at the sub_current pixel intersects with a sphere
+                    int intersect_check = doesIntersect(((world->spheres)[index]), CAMERA_POSITION, sub_current_pixel, &t);
 
-                    // if it doesn't we check the next sphere, but if it does we exit the loop
+                    // if not, then the sub_current pixel is not part of a sphere, we can continue
                     if (intersect_check == 0) {
                         continue;
                     }
-                    else {
-                        break;
+
+                    // if the sub_current pixel is part of a sphere, we check to make sure the sub_current pixel shows the frontmost sphere by choosing the lowest t value
+                    if ((t < min_t) || (min_t == -1)) {
+                        min_t = t;
+                        sub_current_sphere_pos = ((world->spheres)[index])->pos;
+                        sub_current_colour = ((world->spheres)[index])->color;
                     }
+
                 }
 
-                // shades in current pixel if necessary
-                if (intersect_check == 1) {
-                    final_colour = scalarMultiply(SHADOW_FACTOR, final_colour);
+                Vec3 final_colour;
+
+                // sets final colour to the background colour if sub_current pixel is not part of a sphere
+                if ((min_t == -1)) {
+                    final_colour = BACKGROUND_COLOUR;
                 }
+                // shades sphere accordingly if pixel is a part of a sphere
+                else {
+                    // using our t value and info given by the user, we create vectors/variables needed for our shading calculation 
+                    Vec3 intersection = scalarMultiply(min_t, sub_current_pixel);;
+                    Vec3 light_direction = subtract(LIGHT_POSITION, intersection);
+                    Vec3 surface_normal = normalize(subtract(intersection, sub_current_sphere_pos));
+                    Vec3 light_direction_normal = normalize(light_direction);
+                    float light_dot_surface = dot(light_direction_normal, surface_normal);
+                    float max = 0;
+                    if (max < light_dot_surface) {
+                        max = light_dot_surface;
+                    }
+
+                    // calculates intensity value
+                    float dist = distance(LIGHT_POSITION, intersection);
+                    float dist2 = dist * dist;
+                    float I_0 = LIGHT_BRIGHTNESS * (max/dist2);
+                    float I = 1.0;
+
+                    // caps our intensity value
+                    if (I > I_0) {
+                        I = I_0;
+                    }
+                    
+                    // calculates colour using intensity and sphere colour
+                    final_colour = scalarMultiply(I, sub_current_colour);
+
+                    // for loop and variables to check for shading eligibility
+                    float light_t = -1;
+                    for (int index = 0; index < SPHERE_NUMBER; index++) {
+
+                        // checks to see if the ray that goes from the sub_current pixel's intersection point (with the sphere) to the light source intersects with another sphere
+                        // if it doesn't we check the next sphere, but if it does we exit the loop
+                        if (doesIntersect(((world->spheres)[index]), add(intersection, scalarMultiply(0.001, surface_normal)), light_direction_normal, &light_t)) {
+                            final_colour = scalarMultiply(SHADOW_FACTOR, final_colour);
+                            break;
+                        }
+
+                    }
+
+                }
+
+                // readjust our color scale to [0-255] and writes colour into file
+                final_colour = scalarMultiply(255.0, final_colour);
+                colour_sum = add(colour_sum, final_colour);
 
             }
 
-            // readjust our color scale to [0-255] and writes colour into file
-            final_colour = scalarMultiply(255.0, final_colour);
-            writeColour(output_file, final_colour);
-
-            }
-
-
+                writeColour(output_file, scalarDivide(colour_sum, 9.00));
 
         }
+
+
+
+
+
+    }
 
         // frees allocated memory and closes output file
         freeWorld(world);
@@ -214,4 +223,4 @@ int main(int argc, char *argv[]) {
         // returns 0 to signify successful output
         return 0;
 
-    }
+}
