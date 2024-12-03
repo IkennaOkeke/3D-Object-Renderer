@@ -1,3 +1,4 @@
+# variables
 CC = gcc
 CFLAGS = -Wall -Werror -std=c99
 OBJECTS = spheres.o color.o vector.o
