@@ -191,8 +191,10 @@ int main(int argc, char *argv[]) {
                         // checks to see if the ray that goes from the sub_current pixel's intersection point (with the sphere) to the light source intersects with another sphere
                         // if it doesn't we check the next sphere, but if it does we exit the loop
                         if (doesIntersect(((world->spheres)[index]), add(intersection, scalarMultiply(0.001, surface_normal)), light_direction_normal, &light_t)) {
-                            final_colour = scalarMultiply(SHADOW_FACTOR, final_colour);
-                            break;
+                            if (light_t < length(light_direction)) {
+                                final_colour = scalarMultiply(SHADOW_FACTOR, final_colour);
+                                break;
+                            }
                         }
 
                     }
