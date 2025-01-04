@@ -23,7 +23,7 @@ The formatting of input.txt should be like so:<br />
 Now you will be able to run the executable. <br />
 To run the executable, open up your terminal, navigate to the directory of the downloaded files (cd "directory-location"), and run the executable using the command "./3D_Obj_Renderer.exe input.txt output.ppm".<br /><br />
 
-To view the output.ppm file, you can drop the file in an online .ppm viewer like this one: ![PPM Viewer](https://www.cs.rhodes.edu/welshc/COMP141_F16/ppmReader.html). <br />
+To view the output.ppm file, you can drop the file in an online .ppm viewer like this one: [PPM Viewer](https://www.cs.rhodes.edu/welshc/COMP141_F16/ppmReader.html). <br />
 
 Or, if you use VSCode, you can download the PPM extension and view the file within VSCode.<br /><br />
 The provided input.txt file in the repository has been pre-made with the following specifications: <br /><br />
