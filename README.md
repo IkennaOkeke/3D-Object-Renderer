@@ -1,8 +1,8 @@
 # 3D-Object-Renderer
-This program is a 3-D shape renderer by Ikenna Okeke.<br /><br />
-![](output4.png)<br /><br />
+This program is a 3-D shape renderer by Ikenna Okeke. <br /><br />
+![](output4.png)<br /><br /> An explanation of the program can be found further below. <br /><br />
 To use this program, download the .exe file, as well as the input.txt and output.ppm files (make sure they are all in the same folder).<br />
-Before running the executable, you must write input.txt, which may require some knowledge on the inner workings of the program (provided further below). <br /><br />
+Before running the executable, you must write input.txt, which may require some knowledge on the inner workings of the program. <br /><br />
 The formatting of input.txt should be like so:  
 
 ```
