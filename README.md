@@ -2,7 +2,6 @@
 This program is a 3-D shape renderer by Ikenna Okeke.<br /><br />
 To use this program, download the .exe file, as well as the input.txt and output.ppm files (make sure they are all in the same folder).<br />
 Before running the executable, you must write input.txt, which may require some knowledge on the inner workings of the program (provided further below). <br /><br />
-
 The formatting of input.txt should be like so:<br /><br />
 ```
 <image width (int)> <image height (int)>
@@ -19,13 +18,10 @@ The formatting of input.txt should be like so:<br /><br />
 <sphere n position (3float)> <sphere n radius (float)> <sphere n color index (int)>
 ```
 <br />
-
 Now you will be able to run the executable. <br />
 To run the executable, open up your terminal, navigate to the directory of the downloaded files (cd "directory-location"), and run the executable using the command "./3D_Obj_Renderer.exe input.txt output.ppm".<br /><br />
-
 To view the output.ppm file, you can drop the file in an online .ppm viewer like this one: [PPM Viewer](https://www.cs.rhodes.edu/welshc/COMP141_F16/ppmReader.html).<br />
 Or, if you use VSCode, you can download the PPM extension and view the file within VSCode.<br /><br />
-
 The provided input.txt file in the repository has been pre-made with the following specifications: <br /><br />
 ```
 400 300
@@ -42,7 +38,6 @@ The provided input.txt file in the repository has been pre-made with the followi
    5 0.0 -11   2 2
 ```
 <br />
-
 This gives: <br /><br />
 ![](output.png)
 
