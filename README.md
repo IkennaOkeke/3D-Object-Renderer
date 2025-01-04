@@ -4,7 +4,7 @@ To use this program, download the .exe file, as well as the input.txt and output
 Before running the executable, you must write input.txt, which may require some knowledge on the inner workings of the program (provided further below). <br /><br /><br />
 
 The formatting of input.txt should be like so:<br /><br />
-'''
+```
 <image width (int)> <image height (int)>
 <viewport height (float)>
 <focal length (float)>
@@ -17,7 +17,7 @@ The formatting of input.txt should be like so:<br /><br />
 <sphere 2 position (3float)> <sphere 2 radius (float)> <sphere 2 color index (int)>
 ...
 <sphere n position (3float)> <sphere n radius (float)> <sphere n color index (int)>
-'''
+```
 <br /><br />
 
 Now you will be able to run the executable. <br />
