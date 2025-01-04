@@ -48,8 +48,53 @@ This gives: <br /><br />
 
 ![](output.png) <br /><br />
 
-To sum up how it works, this program utilizes the concepts of linear algebra (specifically vectors and ray intersection) as the foundation for its logic.<br />What happens (speaking in terms of the space of real 3-dimensional vectors) is that there is an imaginary camera at position (0, 0, 0), and a "viewport" at a position in front of the camera (For example, if you were taking a picture, the viewport would be the portion of the world that your camera can see — the image that your camera would show you when the picture is taken).<br />The focal length is the distance between the camera and the viewport (the z value of the viewport, or the "zoom" of the camera), and the viewport height/width determines how much the camera can see of the imaginary 3D world.<br />Essentially, what the program does is iterate through each pixel (the image dimensions) in the viewport, and check to see if there is a sphere at that position.<br />To do this, the program casts a ray (given by the formula (p + td), where 'p' is the starting point of the ray, 'd' is the direction the ray points to, and 't' is the time it takes for that ray to reach the given direction vector) from the camera to the center of that specific pixel in the viewport.<br />The program then checks to see if that ray intersects with any of the given spheres (given by the formula (|x-c|^2 = r^2), where x is a vector located on the surface of the sphere, c is a vector at the center of the sphere, and r is the radius of the sphere) by iterating through each sphere and solving for the time value (t) of the sphere equation (|x-c|^2 = r^2), where x is given by the current casted ray (doing this will give a polynomial, which the program then applies the quadratic equation to, giving us our time value/s).<br />What this does is check to see that a ray (which you can visualize as a line in the 3D space) hits the sphere at any point in time in that imaginary 3D world.<br />For example, if the time given by the quadratic equation is nonexistent (no solutions to the polynomial), then there will never be a point in time where the ray intersects with the sphere, meaning that the current pixel the program is on should not display a portion of that sphere.<br />If there are two 't' values, however, the ray will enter the sphere at one point in time, and exit at another point in time (unless the camera is inside the sphere or other complications, in which case the program would get one 't' value), meaning that the current pixel should display the point at which the ray FIRST intersects with the sphere.<br /><br /> If the ray cast from the current pixel has zero intersections whatsoever, then the program knows to simply print the background colour (given by the user). If the ray only intersects with one sphere, then we colour the pixel based on that sphere's colour and shade accordingly. If the ray hits more than one sphere, however, then the program simply stores the smallest time value and colours the pixel based on the sphere which gave us that value.<br /><br />In order to colour each pixel properly, the program uses a formula which takes the user's light-source position and direction vectors to shade the current pixel, based on the distance between the point on the surface of the sphere that the original casted ray hit and the light source.<br />Similarly to our previous logic, the program checks the time values that this gives.<br />If there are no time values, then that portion of the sphere will never see light, so it should be coloured dark.<br />If the are t-values, then the program shades the current pixel based on its given light intensity formula.<br /><br />Finally, the program writes the current pixel's RGB value to the ppm file. The program continues this process until every pixel has been checked, and then terminates.
+## How it works:<br />
+To sum up how it works, this program utilizes the concepts of linear algebra (specifically vectors and ray intersection) as the foundation for its logic.<br />What happens (speaking in terms of the space of real 3-dimensional vectors) is that there is an imaginary camera at position (0, 0, 0), and a "viewport" at a position in front of the camera (For example, if you were taking a picture, the viewport would be the portion of the world that your camera can see — the image that your camera would show you when the picture is taken).<br />The focal length is the distance between the camera and the viewport (the z value of the viewport, or the "zoom" of the camera), and the viewport height/width determines how much the camera can see of the imaginary 3D world.<br />Essentially, what the program does is iterate through each pixel (the image dimensions) in the viewport, and check to see if there is a sphere at that position.<br />To do this, the program casts a ray (given by the formula (p + td), where 'p' is the starting point of the ray, 'd' is the direction the ray points to, and 't' is the time it takes for that ray to reach the given direction vector) from the camera to the center of that specific pixel in the viewport.<br />The program then checks to see if that ray intersects with any of the given spheres (given by the formula (|x-c|^2 = r^2), where x is a vector located on the surface of the sphere, c is a vector at the center of the sphere, and r is the radius of the sphere) by iterating through each sphere and solving for the time value (t) of the sphere equation (|x-c|^2 = r^2), where x is given by the current casted ray (doing this will give a polynomial, which the program then applies the quadratic equation to, giving us our time value/s).<br />What this does is check to see that a ray (which you can visualize as a line in the 3D space) hits the sphere at any point in time in that imaginary 3D world.<br />For example, if the time given by the quadratic equation is nonexistent (no solutions to the polynomial), then there will never be a point in time where the ray intersects with the sphere, meaning that the current pixel the program is on should not display a portion of that sphere.<br />If there are two 't' values, however, the ray will enter the sphere at one point in time, and exit at another point in time (unless the camera is inside the sphere or other complications, in which case the program would get one 't' value), meaning that the current pixel should display the point at which the ray FIRST intersects with the sphere.<br /><br /> If the ray cast from the current pixel has zero intersections whatsoever, then the program knows to simply print the background colour (given by the user). If the ray only intersects with one sphere, then we colour the pixel based on that sphere's colour and shade accordingly. If the ray hits more than one sphere, however, then the program simply stores the smallest time value and colours the pixel based on the sphere which gave us that value.<br /><br />In order to colour each pixel properly, the program uses a formula which takes the user's light-source position and direction vectors to shade the current pixel, based on the distance between the point on the surface of the sphere that the original casted ray hit and the light source.<br />The program also must check for shadows, which occurs when the ray casted from the surface of one sphere to the light source intersects with another sphere. Similarly to our previous logic, the program does this by iterating through each sphere and checking the time values that this gives.<br />If there are no time values, then that portion of the sphere will always see light, so it should be coloured based on the given light intensity formula.<br />If there are t-values, then the program shades the current pixel dark to imitate a shadow.<br /><br />Finally, the program writes the current pixel's RGB value to the ppm file. <br />The program continues this process until every pixel has been checked, and then terminates.<br /><br />
 
+## More Examples:<br />
+
+Input: <br />
+
+```
+640 480
+2.0
+1.0
+20.0 20.0 10.0 1000.0
+4
+0x1188EE 0xDD2266 0xDD7700 0x11CC66
+0
+3
+2.0 0.0 -5.0 2.0 2
+-2.0 0.0 -5.0 2.0 3
+0.0 -102.0 -5.0 100.0 1
+```
+
+<br />
+Output: <br /><br />
+
+![](output2.png) <br /><br /><br />
+
+Input: <br />
+
+```
+640 480
+2.0
+5.0
+-10.0 10.0 -30.0 500.0
+5
+0x6ABADA 0xFFFF00 0xFF4500 0x00FF00 0x0000FF
+2
+4
+-6.0 0.0 -50.0 5.0 4
+3.0 0.0 -55.0 3.0 3
+10.0 0.0 -60.0 2.0 1
+15.0 0.0 -65.0 1.0 0
+```
+
+<br />
+Output: <br /><br />
+
+![](output3.png) <br /><br />
 
 
 
