@@ -1,5 +1,5 @@
 # 3D-Object-Renderer
-This program is a 3-D shape renderer by Ikenna Okeke.<br /><br /><br />
+This program is a 3-D shape renderer by Ikenna Okeke.<br /><br />
 To use this program, download the .exe file, as well as the input.txt and output.ppm files (make sure they are all in the same folder).<br />
 Before running the executable, you must write input.txt, which may require some knowledge on the inner workings of the program (provided further below). <br /><br />
 
@@ -18,7 +18,7 @@ The formatting of input.txt should be like so:<br /><br />
 ...
 <sphere n position (3float)> <sphere n radius (float)> <sphere n color index (int)>
 ```
-<br /><br />
+<br />
 
 Now you will be able to run the executable. <br />
 To run the executable, open up your terminal, navigate to the directory of the downloaded files (cd "directory-location"), and run the executable using the command "./3D_Obj_Renderer.exe input.txt output.ppm".<br /><br />
@@ -41,7 +41,7 @@ The provided input.txt file in the repository has been pre-made with the followi
   -5 0.0 -11   2 2
    5 0.0 -11   2 2
 ```
-<br /><br />
+<br />
 
 This gives: <br /><br />
 ![](output.png)
